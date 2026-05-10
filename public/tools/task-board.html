@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LIAN Legacy Task Board</title>
+    <link rel="stylesheet" href="/tools/task-board.css">
+    <link rel="stylesheet" href="/tools/task-board-structure.css">
+  </head>
+  <body>
+    <div class="shell">
+      <header class="topbar">
+        <div>
+          <h1>LIAN Legacy Task Board</h1>
+          <div class="subtitle">旧任务板的历史 / 内部视图。当前权威控制面已迁移到 GitHub Control Room、issues、PRs 和标签。</div>
+          <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:13px;">
+            <strong style="padding:4px 8px;border-radius:999px;background:rgba(245, 158, 11, 0.18);color:#b45309;">Legacy viewer</strong>
+            <a href="https://github.com/taoyu051818-sys/lian-platform-server/issues/112" target="_blank" rel="noreferrer">Control Room #112</a>
+            <a href="https://github.com/taoyu051818-sys/lian-mobile-web/issues?q=is%3Aopen+sort%3Aupdated-desc" target="_blank" rel="noreferrer">Frontend issue queue</a>
+            <a href="https://github.com/taoyu051818-sys/lian-mobile-web/pulls?q=is%3Aopen+sort%3Aupdated-desc" target="_blank" rel="noreferrer">Frontend PR queue</a>
+          </div>
+        </div>
+        <div class="counts">
+          <span>Total: <span class="count-val" id="countTotal">0</span></span>
+          <span>Blocked: <span class="count-val" id="countBlocked">0</span></span>
+          <span>Human: <span class="count-val" id="countHuman">0</span></span>
+          <span>Ready: <span class="count-val" id="countReady">0</span></span>
+        </div>
+        <div class="queue-summary" id="queueSummary"></div>
+      </header>
+
+      <aside class="sidebar" id="sidebar"></aside>
+
+      <section class="main">
+        <section class="dashboard" aria-label="Legacy development dashboard">
+          <article class="panel panel-wide" aria-label="Legacy task board notice">
+            <div class="panel-head">
+              <h2>Superseded Source Notice</h2>
+              <span class="panel-note">This page remains useful for historical context, but not for authoritative coordination.</span>
+            </div>
+            <div style="display:grid;gap:12px;line-height:1.65;">
+              <p style="margin:0;">This page still renders the legacy Markdown-backed task board. Use <strong>Control Room #112</strong> plus live GitHub issue and PR labels for the current source of truth.</p>
+              <p style="margin:0;">Treat all counts, queues, and progress signals below as informational only. They may lag behind current GitHub routing, gate decisions, and agent marker comments.</p>
+              <div style="display:flex;flex-wrap:wrap;gap:10px;">
+                <a href="https://github.com/taoyu051818-sys/lian-platform-server/issues/112" target="_blank" rel="noreferrer">Open Control Room</a>
+                <a href="https://github.com/taoyu051818-sys/lian-mobile-web/issues?q=is%3Aopen+label%3Aagent%3Afollow-up-needed+sort%3Aupdated-desc" target="_blank" rel="noreferrer">Follow-up label queue</a>
+                <a href="https://github.com/taoyu051818-sys/lian-mobile-web/pulls?q=is%3Aopen+label%3AAI_REQUEST_CHANGES+sort%3Aupdated-desc" target="_blank" rel="noreferrer">PRs needing changes</a>
+              </div>
+            </div>
+          </article>
+          <div class="metric-grid" id="metricGrid"></div>
+          <div class="dashboard-grid">
+            <article class="panel panel-wide">
+              <div class="panel-head">
+                <h2>自动工作流分组</h2>
+                <span class="panel-note">基于旧任务板内容的自动归类，仅供历史参考</span>
+              </div>
+              <div class="workstream-grid" id="workstreamGrid"></div>
+            </article>
+            <article class="panel">
+              <div class="panel-head">
+                <h2>最近开发速度</h2>
+                <span class="panel-note" id="recentWindowLabel">最近窗口</span>
+              </div>
+              <div class="recent-list" id="recentList"></div>
+            </article>
+          </div>
+          <article class="panel">
+            <div class="panel-head">
+              <h2>排期 / 等待开发 / 复核队列</h2>
+              <span class="panel-note">旧看板派生视图，不替代 GitHub 实时队列</span>
+            </div>
+            <div class="lane-board" id="laneBoard"></div>
+          </article>
+          <article class="panel architecture-panel">
+            <div class="panel-head">
+              <h2>项目架构图</h2>
+              <span class="panel-note">Mermaid 风格 flowchart；不依赖外部 CDN，任务接口 401 时仍可显示</span>
+            </div>
+            <div class="mermaid-visual" aria-label="LIAN frontend architecture Mermaid style flowchart">
+              <div class="mmd-row mmd-row-root">
+                <div class="mmd-node mmd-root">LIAN Mobile Web<span>Campus Experience Layer</span></div>
+              </div>
+              <div class="mmd-edge-row"><span></span></div>
+              <div class="mmd-row">
+                <div class="mmd-node mmd-decision">Frontend Runtime<span>Legacy + Vue + Tools</span></div>
+              </div>
+              <div class="mmd-split-row"><span></span><span></span><span></span></div>
+              <div class="mmd-row mmd-row-three">
+                <div class="mmd-node mmd-runtime">Legacy Static Runtime<span>public/app*.js<br>feed · publish · map-v2</span></div>
+                <div class="mmd-node mmd-runtime">Vue 3 + Vite Shell<span>src/main.ts → App.vue</span></div>
+                <div class="mmd-node mmd-runtime">Internal Tools<span>Legacy task board viewer</span></div>
+              </div>
+              <div class="mmd-row mmd-row-three mmd-subrow">
+                <div class="mmd-node mmd-api">/api/* proxy<span>127.0.0.1:4200</span></div>
+                <div class="mmd-node mmd-page">App Shell<span>TopBar · AppViewHost<br>BottomTabBar · ToastHost</span></div>
+                <div class="mmd-node mmd-tool">Legacy Development Board<span>历史进度 · 内部参考 · 非权威状态</span></div>
+              </div>
+              <div class="mmd-row mmd-row-three mmd-subrow">
+                <div class="mmd-node mmd-guard">Automation Guards<span>npm run check<br>structure · smoke · encoding</span></div>
+                <div class="mmd-node mmd-page">Primary Views<span>Feed · Map · Messages · Profile</span></div>
+                <div class="mmd-node mmd-api">Internal Task API<span>legacy markdown source</span></div>
+              </div>
+              <div class="mmd-row mmd-row-three mmd-subrow">
+                <div class="mmd-node mmd-api">NodeBB<span>community backend</span></div>
+                <div class="mmd-node mmd-api">lian-platform-server<span>metadata · feed · auth · ops</span></div>
+                <div class="mmd-node mmd-api">Redis object-native<span>runtime data store</span></div>
+              </div>
+            </div>
+            <details class="mermaid-source-block">
+              <summary>查看 Mermaid 源码</summary>
+              <pre>flowchart TB
+  Product([LIAN Mobile Web]) --> Runtime{Frontend Runtime}
+  Runtime --> Legacy[Legacy Static Runtime]
+  Runtime --> Vue[Vue 3 + Vite Shell]
+  Runtime --> Tools[Internal Tools]
+  Vue --> Shell[App Shell]
+  Shell --> Views[Feed / Map / Messages / Profile]
+  Tools --> Board[Legacy Development Board]
+  Board -. informational only .-> TaskAPI[/api/internal/task-board/]
+  Legacy --> Api[/api/* proxy/]
+  Vue --> Api
+  Api --> Backend[(lian-platform-server)]
+  Backend --> NodeBB[(NodeBB)]
+  Backend --> Redis[(Redis object-native)]
+  Scripts[Automation Guards] --> Runtime
+  Scripts --> Board</pre>
+            </details>
+            <div class="architecture-grid">
+              <section class="architecture-card">
+                <h3>文件夹结构</h3>
+                <p><strong>public/</strong> 承载当前 Legacy 静态运行时；<strong>src/</strong> 承载 Vue 3 新 UI 壳；<strong>scripts/</strong> 承载结构校验、静态演练和 smoke 守卫。</p>
+              </section>
+              <section class="architecture-card">
+                <h3>页面结构</h3>
+                <p>主页面由 <strong>feed</strong>、<strong>map</strong>、<strong>messages</strong>、<strong>profile</strong> 四个 Vue view 组成；工具页独立在 <strong>public/tools/</strong>，并保留为历史 / 内部参考面板。</p>
+              </section>
+              <section class="architecture-card">
+                <h3>运行关系</h3>
+                <p>4300 是 Legacy 静态运行时，4301 是 Vue canary。工具页可独立展示架构图；实时协调请回到 GitHub Control Room #112 和 live label queues。</p>
+              </section>
+            </div>
+          </article>
+        </section>
+
+        <table class="task-table">
+          <thead>
+            <tr>
+              <th data-sort="title">Title <span class="sort-arrow">&#x25B4;</span></th>
+              <th data-sort="workstream">Workstream <span class="sort-arrow">&#x25B4;</span></th>
+              <th data-sort="status">Status <span class="sort-arrow">&#x25B4;</span></th>
+              <th data-sort="priority">Priority <span class="sort-arrow">&#x25B4;</span></th>
+              <th data-sort="latestDate">Latest <span class="sort-arrow">&#x25B4;</span></th>
+              <th data-sort="humanAssisted">Human <span class="sort-arrow">&#x25B4;</span></th>
+            </tr>
+          </thead>
+          <tbody id="taskBody"></tbody>
+        </table>
+      </section>
+
+      <aside class="detail" id="detailPanel">
+        <div class="detail-empty">Select a task to view details</div>
+      </aside>
+    </div>
+
+    <script src="/tools/task-board.js"></script>
+  </body>
+</html>
